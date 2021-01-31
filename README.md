@@ -1,0 +1,3 @@
+Projekt końcowy.
+
+Aplikacja blogowa.
