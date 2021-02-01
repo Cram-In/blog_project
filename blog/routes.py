@@ -23,39 +23,34 @@ def login_required(view_func):
 
 @app.route("/post/", methods=["GET", "POST"])
 @login_required
-def entry():
+def create_entry():
     form = EntryForm()
     errors = None
-    if request.args.get("new"):
+    if request.method == "POST":
         if form.validate_on_submit():
-            is_published = form.is_published.data
-            if is_published == True:
-                entry = Entry(title=form.title.data, body=form.body.data, is_published=form.is_published.data)
-                db.session.add(entry)
-                db.session.commit()
-                flash("Your Post has been published!", "info")
-                return redirect("/")
-            else:
-                entry = Entry(title=form.title.data, body=form.body.data, is_published=form.is_published.data)
-                db.session.add(entry)
-                db.session.commit()
-                flash("Post created but not published!", "info")
-                return redirect("/")
+            entry = Entry(title=form.title.data, body=form.body.data, is_published=form.is_published.data)
+            db.session.add(entry)
+            db.session.commit()
         else:
             errors = form.errors
-    elif request.args.get("edit"):
+    return render_template("entry_form.html", form=form, errors=errors)
 
-        entry = Entry.query.filter_by(id=entry_id).first_or_404()
-        form = EntryForm(obj=entry)
-        errors = None
+
+@app.route("/edit-post/<int:entry_id>", methods=["GET", "POST"])
+@login_required
+def edit_entry(entry_id):
+
+    entry = Entry.query.filter_by(id=entry_id).first_or_404()
+    form = EntryForm(obj=entry)
+    errors = None
+    if request.method == "POST":
+
         if form.validate_on_submit():
             form.populate_obj(entry)
             db.session.commit()
-            flash("Your Post has been updated!", "info")
-            return redirect("/")
+
         else:
             errors = form.errors
-
     return render_template("entry_form.html", form=form, errors=errors)
 
 
