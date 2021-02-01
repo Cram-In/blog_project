@@ -27,10 +27,19 @@ def create_entry():
     form = EntryForm()
     errors = None
     if request.method == "POST":
-        if form.validate_on_submit():
+        is_published = form.is_published.data
+        if is_published == True:
             entry = Entry(title=form.title.data, body=form.body.data, is_published=form.is_published.data)
             db.session.add(entry)
             db.session.commit()
+            flash("Your Post has been published!", "success")
+            return redirect("/")
+        elif is_published == False:
+            entry = Entry(title=form.title.data, body=form.body.data, is_published=form.is_published.data)
+            db.session.add(entry)
+            db.session.commit()
+            flash("Post created and saved in Drafts", "info")
+            return redirect("/")
         else:
             errors = form.errors
     return render_template("entry_form.html", form=form, errors=errors)
@@ -48,7 +57,8 @@ def edit_entry(entry_id):
         if form.validate_on_submit():
             form.populate_obj(entry)
             db.session.commit()
-
+            flash("Your Post has been updated!", "info")
+            return redirect("/")
         else:
             errors = form.errors
     return render_template("entry_form.html", form=form, errors=errors)
@@ -94,7 +104,7 @@ def delete_entry(entry_id):
     db.session.delete(entry)
     db.session.commit()
     flash("Post Deleted.", "success")
-    return redirect("/")
+    return redirect("/drafts/")
 
 
 @app.route("/contact/", methods=["GET", "POST"])
