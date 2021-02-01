@@ -1,8 +1,11 @@
 from flask import Flask, request, render_template, redirect, flash, session, url_for
 from blog import app
-from blog.models import Entry, db
-from blog.forms import EntryForm, LoginForm
+from blog.models import Entry, db, Contacts
+from blog.forms import EntryForm, LoginForm, ContactForm
 import functools
+import os
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 
 @app.route("/")
@@ -109,4 +112,36 @@ def delete_entry(entry_id):
 
 @app.route("/contact/", methods=["GET", "POST"])
 def contact():
-    return render_template("contact.html")
+
+    form = ContactForm()
+    error = None
+    if request.method == "POST":
+
+        if form.validate_on_submit():
+
+            email = request.form["email"]
+            title = request.form["title"]
+            name = request.form["name"]
+            surname = request.form["surname"]
+            content = request.form["content"]
+
+            message = Mail(
+                from_email=email,
+                to_emails=os.environ.get("MAIL_DEFAULT_SENDER"),
+                subject=title,
+                html_content="<strong><p>Message from {name} {surname}</p><br><p>{content}</p></strong>",
+            )
+            try:
+                sg = SendGridAPIClient(os.environ.get("SENDGRID_API_KEY"))
+                response = sg.send(message)
+
+                print(response.status_code)
+                print(response.body)
+                print(response.headers)
+
+                flash("Message send!", "success")
+                return redirect("/contact/")
+            except Exception as e:
+                print(f"error", e.body)
+
+    return render_template("/contact.html")

@@ -24,3 +24,11 @@ class LoginForm(FlaskForm):
         if field.data != Config.ADMIN_PASSWORD:
             raise ValidationError("Invalid password")
         return field.data
+
+
+class ContactForm(FlaskForm):
+    email = StringField("Email", validators=[DataRequired()])
+    name = StringField("Name", validators=[DataRequired()])
+    surname = StringField("Surname", validators=[DataRequired()])
+    title = StringField("Title", validators=[DataRequired()])
+    content = StringField("Content", validators=[DataRequired()])
