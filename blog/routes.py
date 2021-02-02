@@ -1,8 +1,9 @@
 from flask import Flask, request, render_template, redirect, flash, session, url_for
 from blog import app
-from blog.models import Entry, db, Contacts
+from blog.models import Entry, db
 from blog.forms import EntryForm, LoginForm, ContactForm
-import functools
+from blog.decorators import login_required
+from blog.func import new_entry
 import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
@@ -14,16 +15,6 @@ def index():
     return render_template("homepage.html", all_posts=all_posts)
 
 
-def login_required(view_func):
-    @functools.wraps(view_func)
-    def check_permissions(*args, **kwargs):
-        if session.get("logged_in"):
-            return view_func(*args, **kwargs)
-        return redirect(url_for("login", next=request.path))
-
-    return check_permissions
-
-
 @app.route("/post/", methods=["GET", "POST"])
 @login_required
 def create_entry():
@@ -32,15 +23,11 @@ def create_entry():
     if request.method == "POST":
         is_published = form.is_published.data
         if is_published == True:
-            entry = Entry(title=form.title.data, body=form.body.data, is_published=form.is_published.data)
-            db.session.add(entry)
-            db.session.commit()
+            new_entry(form)
             flash("Your Post has been published!", "success")
             return redirect("/")
         elif is_published == False:
-            entry = Entry(title=form.title.data, body=form.body.data, is_published=form.is_published.data)
-            db.session.add(entry)
-            db.session.commit()
+            new_entry(form)
             flash("Post created and saved in Drafts", "info")
             return redirect("/")
         else:
@@ -51,12 +38,10 @@ def create_entry():
 @app.route("/edit-post/<int:entry_id>", methods=["GET", "POST"])
 @login_required
 def edit_entry(entry_id):
-
     entry = Entry.query.filter_by(id=entry_id).first_or_404()
     form = EntryForm(obj=entry)
     errors = None
     if request.method == "POST":
-
         if form.validate_on_submit():
             form.populate_obj(entry)
             db.session.commit()
@@ -112,36 +97,31 @@ def delete_entry(entry_id):
 
 @app.route("/contact/", methods=["GET", "POST"])
 def contact():
-
     form = ContactForm()
     error = None
     if request.method == "POST":
-
-        if form.validate_on_submit():
+        if not form.validate_on_submit():
 
             email = request.form["email"]
             title = request.form["title"]
             name = request.form["name"]
             surname = request.form["surname"]
-            content = request.form["content"]
+            content = request.form["email_content"]
 
             message = Mail(
-                from_email=email,
-                to_emails=os.environ.get("MAIL_DEFAULT_SENDER"),
-                subject=title,
-                html_content="<strong><p>Message from {name} {surname}</p><br><p>{content}</p></strong>",
+                from_email=os.environ.get("MAIL_DEFAULT_SENDER"),
+                to_emails=os.environ.get("MAIL_DEFAULT_RECEIVER"),
+                subject=f"From {email}. Subject: {title}",
+                html_content=f"<strong>Message from {name} {surname}. <p>MESSAGE: {content}</p> </strong>",
             )
             try:
                 sg = SendGridAPIClient(os.environ.get("SENDGRID_API_KEY"))
                 response = sg.send(message)
-
                 print(response.status_code)
                 print(response.body)
                 print(response.headers)
-
-                flash("Message send!", "success")
+                flash("Message Send.", "success")
                 return redirect("/contact/")
             except Exception as e:
                 print(f"error", e.body)
-
     return render_template("/contact.html")

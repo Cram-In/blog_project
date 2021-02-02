@@ -10,6 +10,7 @@ class Entry(db.Model):
     is_published = db.Column(db.Boolean, default=False)
 
 
+"""
 class Contacts(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(15), nullable=False)
@@ -25,3 +26,4 @@ class Contacts(db.Model):
         self.email = email
         self.title = title
         self.content = content
+"""
