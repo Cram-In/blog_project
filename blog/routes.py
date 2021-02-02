@@ -98,7 +98,6 @@ def delete_entry(entry_id):
 @app.route("/contact/", methods=["GET", "POST"])
 def contact():
     form = ContactForm()
-    error = None
     if request.method == "POST":
         if not form.validate_on_submit():
 
@@ -112,7 +111,7 @@ def contact():
                 from_email=os.environ.get("MAIL_DEFAULT_SENDER"),
                 to_emails=os.environ.get("MAIL_DEFAULT_RECEIVER"),
                 subject=f"From {email}. Subject: {title}",
-                html_content=f"<strong>Message from {name} {surname}. <p>MESSAGE: {content}</p> </strong>",
+                html_content=f"<strong>Message from: <p>{name} {surname}.</p><p>MESSAGE:</p> <p>{content}</p> </strong>",
             )
             try:
                 sg = SendGridAPIClient(os.environ.get("SENDGRID_API_KEY"))
