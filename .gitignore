@@ -6,3 +6,4 @@ __pycache__
 tester.py
 start.sh
 virtualenv
+blog/posts.db
