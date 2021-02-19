@@ -2,7 +2,7 @@ __pycache__
 
 .vscode
 .ipynb_checkpoints
-
+.db
 tester.py
 start.sh
 virtualenv
