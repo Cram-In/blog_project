@@ -26,35 +26,6 @@
     integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
     crossorigin="anonymous"></script>
   <!--text editor-->
-  <script src="https://cdn.tiny.cloud/1/s3968qqygjw13bdy05tdalx33z7zou6hkcb040fswop00f78/tinymce/5/tinymce.min.js"
-    referrerpolicy="origin"></script>
-
-  <script>
-    tinymce.init({
-      selector: "textarea#editor",
-      skin: "bootstrap",
-      plugins: "lists, link, image, media",
-      toolbar:
-        "h1 h2 bold italic strikethrough blockquote bullist numlist backcolor | link image media | removeformat help",
-      menubar: false,
-      setup: (editor) => {
-        // Apply the focus effect
-        editor.on("init", () => {
-          editor.getContainer().style.transition =
-            "border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out";
-        });
-        editor.on("focus", () => {
-          (editor.getContainer().style.boxShadow =
-            "0 0 0 .2rem rgba(0, 123, 255, .25)"),
-            (editor.getContainer().style.borderColor = "#80bdff");
-        });
-        editor.on("blur", () => {
-          (editor.getContainer().style.boxShadow = ""),
-            (editor.getContainer().style.borderColor = "");
-        });
-      },
-    });
-  </script>
   <!-- Page Content -->
   {% block head %}{% endblock %}
 </head>
