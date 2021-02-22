@@ -6,7 +6,7 @@ class Config(object):
     DEVELOPMENT = True
     FLASK_HTPASSWD_PATH = "/secret/.htpasswd"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_DATABASE_URI = "sqlite:///posts.db"
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
     SECRET_KEY = "do-i-really-need-this"
     ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "")
     ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
