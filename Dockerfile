@@ -1,4 +1,4 @@
-DockerfileCopy code# Base image
+# Base image
 FROM python:3.8
 # Working directory
 WORKDIR /app
