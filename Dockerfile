@@ -9,4 +9,4 @@ COPY ..
 # Expose the server port
 EXPOSE 8080
 # Command to start the server
-CMD ["python", "routes.py", "gunicorn", "-b", "0.0.0.0:8080", "app:app"]
+CMD ["python", "routes.py", "gunicorn", "-b", "0.0.0.0:8080", "blog:app"]
